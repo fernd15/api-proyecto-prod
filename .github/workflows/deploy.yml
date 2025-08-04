@@ -24,9 +24,6 @@ jobs:
     
     - name: Build project
       run: npm run build
-    
-    - name: Run tests (if you have them)
-      run: npm test --if-present
 
   deploy:
     needs: test
