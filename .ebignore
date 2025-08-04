@@ -1,0 +1,12 @@
+.git
+.gitignore
+README.md
+.env
+.nyc_output
+coverage
+.DS_Store
+node_modules
+npm-debug.log
+Dockerfile
+docker-compose.yml
+.dockerignore 
