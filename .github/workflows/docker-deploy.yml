@@ -1,0 +1,36 @@
+name: Deploy to Docker Desktop
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build project
+      run: npm run build
+    
+    - name: Build Docker image
+      run: docker build -t api-ts .
+    
+    - name: Test Docker image
+      run: |
+        docker run --rm -d --name test-api -p 3000:3000 api-ts
+        sleep 10
+        curl -f http://localhost:3000 || exit 1
+        docker stop test-api 

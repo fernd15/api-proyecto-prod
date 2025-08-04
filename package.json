@@ -6,8 +6,7 @@
     "start": "node dist/server.js",
     "test": "echo \"No tests specified\"",
     "build": "tsc",
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "postinstall": "npm run build"
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
   },
   "keywords": [],
   "author": "",

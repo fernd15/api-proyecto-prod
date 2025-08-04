@@ -1,5 +1,5 @@
 # Dockerfile
-FROM node:18
+FROM node:20
 
 # Crear directorio de la app
 WORKDIR /app
@@ -8,13 +8,16 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instalar dependencias
-RUN npm install
+RUN npm ci --only=production
 
 # Copiar el resto del código
 COPY . .
 
+# Construir la aplicación
+RUN npm run build
+
 # Exponer puerto
 EXPOSE 3000
 
-# Comando para ejecutar la API en modo desarrollo
-CMD ["npm", "run", "dev"]
+# Comando para ejecutar la API en producción
+CMD ["npm", "start"]
