@@ -1,4 +1,4 @@
-import { pool } from "../config/db";
+import { pool } from "../database/mysql";
 
 // Utilidad para ejecutar una consulta SELECT
 async function queryAll(tableName: string) {
