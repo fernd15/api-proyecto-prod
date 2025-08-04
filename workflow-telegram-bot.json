@@ -1,0 +1,137 @@
+{
+  "name": "Telegram Bot + API + AI",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "botToken",
+        "botToken": "={{ $env.TELEGRAM_BOT_TOKEN }}",
+        "updates": "message",
+        "additionalFields": {}
+      },
+      "id": "telegram-webhook",
+      "name": "Telegram Webhook",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.API_BASE_URL }}{{ $env.API_ENDPOINT }}",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "={{ $json }}"
+            }
+          ]
+        }
+      },
+      "id": "http-request",
+      "name": "Call API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "apiKey",
+        "apiKey": "={{ $env.OPENAI_API_KEY }}",
+        "operation": "chat",
+        "model": "gpt-4",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Eres un asistente inteligente que ayuda a los usuarios a interactuar con una API. Analiza el mensaje del usuario y la respuesta de la API para proporcionar respuestas útiles y contextuales. Responde en español de manera amigable y profesional."
+            },
+            {
+              "role": "user",
+              "content": "Usuario: {{ $('Telegram Webhook').item.json.message.text }}\nRespuesta API: {{ $('Call API').item.json.response }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 500
+        }
+      },
+      "id": "openai-agent",
+      "name": "AI Agent",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "botToken",
+        "botToken": "={{ $env.TELEGRAM_BOT_TOKEN }}",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Telegram Webhook').item.json.message.chat.id }}",
+        "text": "={{ $('AI Agent').item.json.choices[0].message.content }}",
+        "additionalFields": {
+          "parseMode": "Markdown"
+        }
+      },
+      "id": "telegram-response",
+      "name": "Send Telegram Response",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Telegram Webhook": {
+      "main": [
+        [
+          {
+            "node": "Call API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call API": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-08-04T17:40:00.000Z",
+  "versionId": "1"
+} 
