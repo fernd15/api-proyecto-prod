@@ -6,10 +6,12 @@ services:
     container_name: mi_api_ts
     ports:
       - "3000:3000"
-    volumes:
-      - .:/app
-      - /app/node_modules
+    #volumes:
+    #  - .:/app
+    #  - /app/node_modules
     environment:
       - NODE_ENV=development
       - PORT=3000
+    env_file:
+      - .env
     restart: unless-stopped
